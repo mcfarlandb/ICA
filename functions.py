@@ -2,10 +2,8 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import FastICA
-from google.colab import drive
 
-drive.mount('/content/drive')
-
+ica = FastICA(whiten='arbitrary-variance')  # Create ICA object
 
 def restrictAngle(angle):
     if angle < -45:
@@ -26,9 +24,6 @@ def fft_matrix(x, T):
 
     omega_k = np.arange(N) / T  # This is the list of frequencies
     return X, omega_k
-
-
-ica = FastICA(whiten='arbitrary-variance')  # Create ICA object
 
 
 def icaVariables(s, MixFirstAngle, MixLastAngle, theta, i):
@@ -299,17 +294,3 @@ def plot_component_mixes(s, T, MixFirstAngle, MixLastAngle, theta, numItr):
         for j in range(numItr):
             plt.plot(theta[i], c_angles[0, i, j], 'o', markersize=12, color=c0_contents[:, i, j], alpha=1 / numItr)
             plt.plot(theta[i], c_angles[1, i, j], 'o', markersize=12, color=c1_contents[:, i, j], alpha=1 / numItr)
-
-
-def saveComponentAngles(a0, a1, a2, Angle1, Angle2, numItr, thetadistance, c_angles, c0_contents, c1_contents):
-    %cd /content/drive/MyDrive/Ben_M_Summer_Research/Data
-
-    np.savez(f'{a0}-{a1}-{a2}_{Angle1}-{Angle2}_{thetadistance}-{numItr}.npz', c_angles=c_angles,
-             c0_contents=c0_contents, c1_contents=c1_contents)
-
-
-def loadComponentAngles(fileNameStr):
-    %cd /content/drive/MyDrive/Ben_M_Summer_Research/Data
-
-    data = np.load(fileNameStr)
-    return data['c_angles'], data['c0_contents'], data['c1_contents']
