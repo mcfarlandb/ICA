@@ -282,7 +282,7 @@ def sourceComponentAngleGraph(MixFirstAngle, MixLastAngle, theta, c_angles, c0_c
     plt.grid()
 
 
-def plot_component_mixes(c_angles, c0_contents, c1_contents, MixFirstAngle, MixLastAngle, theta, numItr):
+def plot_component_mixes(MixFirstAngle,MixLastAngle,c_angles,c0_contents,c1_contents,numItr):
     plt.xlabel(r'$\theta$ for third source')
     plt.ylabel('Angles in degrees')
     plt.axhline(y=MixFirstAngle, color=[1, 0, 0], linestyle='-')
