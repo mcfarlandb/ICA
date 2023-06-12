@@ -302,14 +302,14 @@ def plot_component_mixes(s, T, MixFirstAngle, MixLastAngle, theta, numItr):
 
 
 def saveComponentAngles(a0, a1, a2, Angle1, Angle2, numItr, thetadistance, c_angles, c0_contents, c1_contents):
-    % cd / content / drive / MyDrive / Ben_M_Summer_Research / Data
+    %cd /content/drive/MyDrive/Ben_M_Summer_Research/Data
 
     np.savez(f'{a0}-{a1}-{a2}_{Angle1}-{Angle2}_{thetadistance}-{numItr}.npz', c_angles=c_angles,
              c0_contents=c0_contents, c1_contents=c1_contents)
 
 
 def loadComponentAngles(fileNameStr):
-    % cd / content / drive / MyDrive / Ben_M_Summer_Research / Data
+    %cd /content/drive/MyDrive/Ben_M_Summer_Research/Data
 
     data = np.load(fileNameStr)
     return data['c_angles'], data['c0_contents'], data['c1_contents']
