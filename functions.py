@@ -294,3 +294,6 @@ def plot_component_mixes(c_angles, c0_contents, c1_contents, MixFirstAngle, MixL
         for j in range(numItr):
             plt.plot(theta[i], c_angles[0, i, j], 'o', markersize=12, color=c0_contents[:, i, j], alpha=1 / numItr)
             plt.plot(theta[i], c_angles[1, i, j], 'o', markersize=12, color=c1_contents[:, i, j], alpha=1 / numItr)
+    
+    plt.show()
+          
