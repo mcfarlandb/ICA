@@ -87,13 +87,16 @@ def calculate_component_angles(s, T, theta, MixFirstAngle, MixLastAngle, numItr)
             m0_ICA = M_ICA[:, 0]
             m1_ICA = M_ICA[:, 1]
 
-            c_angles[0, i, j] = math.degrees(
-                math.atan(m0_ICA[1] / m0_ICA[0]))  # m0 is sin, m1 is cos so atan(sin/cos)=atan(tan)=radians
-            if c_angles[0, i, j] < -45:
-                c_angles[0, i, j] = c_angles[0, i, j] + 180
-            c_angles[1, i, j] = math.degrees(math.atan(m1_ICA[1] / m1_ICA[0]))
-            if c_angles[1, i, j] < -45:
-                c_angles[1, i, j] = c_angles[1, i, j] + 180
+            c_angles[0, i, j] = math.degrees(math.atan(m0_ICA[1] / m0_ICA[0]))  # m0 is sin, m1 is cos so atan(sin/cos)=atan(tan)=radians
+            if c_angles[0,i,j]<-180:
+                c_angles[0,i,j] = c_angles[0,i,j]+180
+            if c_angles[0,i,j]>180:
+                c_angles[0,i,j] = c_angles[0,i,j]-180
+            c_angles[1,i,j] = math.degrees(math.atan(m1_ICA[1]/m1_ICA[0]))
+            if c_angles[1,i,j]<-180:
+                c_angles[1,i,j] = c_angles[1,i,j]+180
+            if c_angles[1,i,j]>180:
+                c_angles[1,i,j] = c_angles[0,i,j]-180
 
             # Calculate DFT of c
             C_fft = np.zeros(c.shape)
@@ -288,6 +291,9 @@ def plot_component_mixes(c_angles,c0_contents,c1_contents,MixFirstAngle,MixLastA
     plt.axhline(y=MixFirstAngle, color=[1, 0, 0], linestyle='-')
     plt.axhline(y=MixLastAngle, color=[0, 1, 0], linestyle='-')
     plt.plot(theta, theta, color=[0, 0, 1])
+    plt.plot(theta,theta+180,color=[0,0,1])
+    plt.plot(theta,theta-180,color=[0,0,1])
+    plt.ylim([-95, 95])
     plt.grid()
 
     for i in range(len(theta)):
