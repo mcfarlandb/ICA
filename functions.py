@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 from sklearn.decomposition import FastICA
 
@@ -71,7 +72,7 @@ def calculate_component_angles(s, T, theta, MixFirstAngle, MixLastAngle, numItr)
     m1 = np.array([[math.cos(math.radians(MixLastAngle))], [math.sin(math.radians(MixLastAngle))]])
 
     # Create mixing matrix
-    for i in range(len(theta)):  # Create M and calculate x for each theta
+    for i in tqdm(range(len(theta))):  # Create M and calculate x for each theta
         m2 = np.array([[math.cos(math.radians(theta[i]))], [math.sin(math.radians(theta[i]))]])
         # Calcuate M and x
         M = np.hstack((m0, m1, m2))
