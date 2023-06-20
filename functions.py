@@ -156,7 +156,7 @@ def graphAmplitudeVectors(M, M_ICA):
     axs.grid()
 
 
-def DFTPlot(t, x, N):
+def DFTPlot(t, x, N, T):
     X = np.fft.fft(x)
     freq = np.arange(N) / T
     fig, ax = plt.subplots(3, 1, constrained_layout=True)
