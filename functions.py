@@ -121,6 +121,81 @@ def calculate_component_angles(s, T, theta, MixFirstAngle, MixLastAngle, numItr)
 
     return c_angles, c0_contents, c1_contents
 
+def calculate_component_angles_amplitudes(s, T, theta, MixFirstAngle, MixLastAngle, numItr, a0 ,a1, a2):
+    # Calcuate information on signal
+    S = np.zeros(s.shape)
+    for n in range(s.shape[0]):
+        S[n] = np.abs(np.fft.fft(s[n])) / s.shape[1]
+
+    s0_ind = round((2) * T)
+    s0_amp = S[0, round((2) * T)]
+    s0_rms = np.sqrt(np.mean(s[0] ** 2))
+    s1_ind = round(3 * T)
+    s1_amp = S[1, round(3 * T)]
+    s1_rms = np.sqrt(np.mean(s[1] ** 2))
+    s2_ind = round(5 * T)
+    s2_amp = S[2, round(5 * T)]
+    s2_rms = np.sqrt(np.mean(s[2] ** 2))
+
+    # Create empty arrays
+    c_angles = np.zeros((2, len(theta), numItr))
+    c0_contents = np.zeros((3, len(theta), numItr))
+    c1_contents = np.zeros((3, len(theta), numItr))
+    # prepare angles to stack so no redoing of cos calc
+    m0 = a0*np.array([[math.cos(math.radians(MixFirstAngle))], [math.sin(math.radians(MixFirstAngle))]])
+    m1 = a1*np.array([[math.cos(math.radians(MixLastAngle))], [math.sin(math.radians(MixLastAngle))]])
+
+    # Create mixing matrix
+    for i in tqdm(range(len(theta))):  # Create M and calculate x for each theta
+        m2 = a2*np.array([[math.cos(math.radians(theta[i]))], [math.sin(math.radians(theta[i]))]])
+        # Calcuate M and x
+        M = np.hstack((m0, m1, m2))
+        x = M @ s  # matrix multiplication of M and s
+
+        for j in range(numItr):  # Do ICA set number of times for each theta
+            ica.fit(x.T)  # Create unmixing matric
+            U = ica.components_  # Set unmixing matrix to U
+            M_ICA = np.linalg.inv(U)  # Take inverse of unmixing matrix to find ICA mixing matrix
+            c = U @ x  # Create components matrix
+            c0_rms = np.sqrt(np.mean(c[0] ** 2))
+            c1_rms = np.sqrt(np.mean(c[1] ** 2))
+            m0_ICA = M_ICA[:, 0]
+            m1_ICA = M_ICA[:, 1]
+
+            c_angles[0, i, j] = math.degrees(math.atan(m0_ICA[1] / m0_ICA[0]))  # m0 is sin, m1 is cos so atan(sin/cos)=atan(tan)=radians
+            if c_angles[0,i,j]<-180:
+                c_angles[0,i,j] = c_angles[0,i,j]+180
+            if c_angles[0,i,j]>180:
+                c_angles[0,i,j] = c_angles[0,i,j]-180
+            c_angles[1,i,j] = math.degrees(math.atan(m1_ICA[1]/m1_ICA[0]))
+            if c_angles[1,i,j]<-180:
+                c_angles[1,i,j] = c_angles[1,i,j]+180
+            if c_angles[1,i,j]>180:
+                c_angles[1,i,j] = c_angles[0,i,j]-180
+
+            # Calculate DFT of c
+            C_fft = np.zeros(c.shape)
+            for k in range(c.shape[0]):
+                C_fft[k] = np.abs(np.fft.fft(c[k])) / c.shape[1]
+
+            # Use DFT to find amplitude of signals in components
+            s0_amp_inC0 = (C_fft[0, s0_ind] / c0_rms) / (s0_amp / s0_rms)
+            s1_amp_inC0 = (C_fft[0, s1_ind] / c0_rms) / (s1_amp / s1_rms)
+            s2_amp_inC0 = (C_fft[0, s2_ind] / c0_rms) / (s2_amp / s2_rms)
+            c0_contents[:, i, j] = np.array([s0_amp_inC0, s1_amp_inC0, s2_amp_inC0])
+            if np.max(c0_contents[:, i, j]) > 1:
+                c0_contents[:, i, j] = c0_contents[:, i, j] / np.max(c0_contents[:, i, j])
+
+            s0_amp_inC1 = (C_fft[1, s0_ind] / c1_rms) / (s0_amp / s0_rms)
+            s1_amp_inC1 = (C_fft[1, s1_ind] / c1_rms) / (s1_amp / s1_rms)
+            s2_amp_inC1 = (C_fft[1, s2_ind] / c1_rms) / (s2_amp / s2_rms)
+            c1_contents[:, i, j] = np.array([s0_amp_inC1, s1_amp_inC1, s2_amp_inC1])
+            if np.max(c1_contents[:, i, j]) > 1:
+                c1_contents[:, i, j] = c1_contents[:, i, j] / np.max(c1_contents[:, i, j])
+
+    return c_angles, c0_contents, c1_contents
+
+
 
 def graphAmplitudes(x, letter):
     fig, axs = plt.subplots(1, 1, constrained_layout=True, figsize=[5, 5])
